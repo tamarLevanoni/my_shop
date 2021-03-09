@@ -1,13 +1,9 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const path = require('path');
 const cors = require("cors");
 const mongoose = require("mongoose");
 
 mongoose.connect("mongodb+srv://shuki:12345@cluster0.7o9mm.mongodb.net/beta_shop?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
-
-// const fs = require("fs");
-
-// let products = require("./products");
 
 
 const productSchema = new mongoose.Schema({
@@ -39,10 +35,11 @@ var corsOptions = {
 app.use(express.json());
 // app.use(cors());
 app.use(cors(corsOptions));
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 
-
-app.get("/products", async(req, res) => {
+app.get("/api/products", async(req, res) => {
   const products = await Product.find({}).exec();
   const { q } = req.query;
   if (q) {
@@ -51,23 +48,19 @@ app.get("/products", async(req, res) => {
     res.send(products);
   }
 });
-app.get("/products/:id", async(req, res) => {
+app.get("/api/products/:id", async(req, res) => {
   const { id } = req.params;
   const product = await Product.findById(id).exec();
   res.send(product ?? {});
 });
-app.get("/products/:id", async(req, res) => {
-  const { id } = req.params;
-  const product = await Product.findOne({title}).exec();
-  res.send(product ?? {});
-});
-app.post("/products", async(req, res) => {
+
+app.post("/api/products", async(req, res) => {
   const { title, price, description, category, image } = req.body;
  await new Product({ title, price, description, category, image }).save();
 
   res.send("OK");
 });
-app.put("/products/:id", async (req, res) => {
+app.put("/api/products/:id", async (req, res) => {
   const { id } = req.params;
   const { title, price, description, category, image } = req.body;
 
@@ -75,13 +68,19 @@ app.put("/products/:id", async (req, res) => {
   res.send("OK!");
 });
 
-app.delete("/products/:id", async (req, res) => {
+app.delete("/api/products/:id", async (req, res) => {
   const { id } = req.params;
 
   await Product.deleteOne({ _id: id }).exec();
   res.send("OK!");
 });
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
+const port = process.env.PORT || 5000;
 
-app.listen(8000, () => {
+app.listen(port, () => {
   console.log("Example app listening on port 8000!");
 });

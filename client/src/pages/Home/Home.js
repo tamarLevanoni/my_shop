@@ -18,13 +18,13 @@ const Home = () => {
   }, []);
 
   async function fetchData() {
-    const response = await fetch("http://127.0.0.1:8000/products/");
+    const response = await fetch("http://127.0.0.1:8000/api/products/");
     const products = await response.json();
     setProducts(products);
     console.log("sucsess");
   }
   async function fetchDataWithQuery(value) {
-    const response = await fetch(`http://127.0.0.1:8000/products?q=${value}`);
+    const response = await fetch(`http://127.0.0.1:8000/api/products?q=${value}`);
     const products = await response.json();
     setProducts(products);
   }
