@@ -1,0 +1,12 @@
+
+.App {
+  text-align: center;
+}
+
+ul{
+  display: flex;
+}
+.li-Router{
+  margin: 6px;
+}
+
